@@ -1,23 +1,44 @@
-import logo from './logo.svg';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 
 function App() {
+
+  const [counter, setCounter] = useState(0);
+  const [pause, setPause] = useState(true);
+  let incrementElement = useRef();
+  let decrementElement = useRef();
+  const paused = useRef(false);
+
+  const clickHandler = (event) => {
+    console.log(incrementElement.current.innerText);
+    if(event.target.innerText === "+") setCounter(counter + 1);
+    else setCounter(counter - 1);
+  }
+
+  useEffect(() => {
+    let interval;
+    if(!pause){
+      interval = setInterval(() => {
+        setCounter(counter + 1);
+      }, 200);
+    }else {
+      paused.current = true;
+    }
+    return () => clearInterval(interval);
+  }, [counter, pause]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App-header">
+      <div>
+        <div ref={decrementElement} name={'decrementElement'} onClick={clickHandler} className='counter'>
+          -
+        </div>  
+        <h1>{counter}</h1>
+        <div ref={incrementElement} name={'incrementElement'} onClick={clickHandler} className='counter'>
+          +
+        </div>
+      </div>
+      <button onClick={() => setPause(prev => !prev)}>{pause ? (paused.current ? "Continue" : "Start") : "Pause"}</button>
     </div>
   );
 }
